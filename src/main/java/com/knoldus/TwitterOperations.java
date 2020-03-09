@@ -19,36 +19,38 @@ public class TwitterOperations {
 
     /**
      * This function gives List of Posts on basis of Keyword.
+     *
      * @param keyword User provided input to fetch tweets.
-     * @param limit Number of Posts.
+     * @param limit   Number of Posts.
      * @return Latest Posts list.
      * @throws TwitterException Exception.
      */
-    CompletableFuture<List<String>> getLatestPosts(String keyword, int limit) throws TwitterException {
+    CompletableFuture<List<String>> getLatestPosts(String keyword, int limit, int offset) throws TwitterException {
 
         CompletableFuture<Stream<Status>> futureTweetsStream = operation.fetch(keyword);
         return futureTweetsStream.thenApply(tweetsStream -> {
             return tweetsStream.map(tweet -> tweet.getText())
                     .limit(limit)
+                    .skip(offset)
                     .collect(Collectors.toList());
         });
 
     }
 
     /**
-     *
      * @param keyword User provided input to fetch tweets.
-     * @param limit Number of Posts.
+     * @param limit   Number of Posts.
      * @return Old Post List.
      * @throws TwitterException Exception.
      */
-    CompletableFuture<List<String>> getOldPosts(String keyword, long limit) throws TwitterException {
+    CompletableFuture<List<String>> getOldPosts(String keyword, int limit, int offset) throws TwitterException {
 
         CompletableFuture<Stream<Status>> futureTweetsStream = operation.fetch(keyword);
         CompletableFuture<List<String>> futureListTweets = futureTweetsStream.thenApply(tweetsStream -> {
             return tweetsStream.map(tweet -> tweet.getText())
                     .sorted(Comparator.reverseOrder())
                     .limit(limit)
+                    .skip(offset)
                     .collect(Collectors.toList());
 
         });
@@ -60,6 +62,7 @@ public class TwitterOperations {
 
     /**
      * It finds number of retweets of given posts.
+     *
      * @param keyword User provided input to fetch tweets.
      * @return List of Retweets.
      * @throws TwitterException Exception.
@@ -68,9 +71,9 @@ public class TwitterOperations {
 
         CompletableFuture<Stream<Status>> futureTweetsStream = operation.fetch(keyword);
         CompletableFuture<List<Integer>> futureListNoOfRetweets = futureTweetsStream.thenApply(tweetsStream -> {
-            return tweetsStream.map(tweet -> tweet.getRetweetCount())
-                    .sorted(Comparator.reverseOrder())
-                    .collect(Collectors.toList());
+                    return tweetsStream.map(tweet -> tweet.getRetweetCount())
+                            .sorted(Comparator.reverseOrder())
+                            .collect(Collectors.toList());
                 }
         );
 
@@ -80,6 +83,7 @@ public class TwitterOperations {
 
     /**
      * It finds List of total number of favorite on each tweet.
+     *
      * @param keyword User provided input to fetch tweets.
      * @return List of Retweets.
      * @throws TwitterException Exception.
@@ -89,9 +93,9 @@ public class TwitterOperations {
         CompletableFuture<Stream<Status>> futureTweetsStream = operation.fetch(keyword);
 
         return futureTweetsStream.thenApply(tweetsStream -> {
-            return tweetsStream.map(tweet -> tweet.getFavoriteCount())
-                    .sorted(Comparator.reverseOrder())
-                    .collect(Collectors.toList());
+                    return tweetsStream.map(tweet -> tweet.getFavoriteCount())
+                            .sorted(Comparator.reverseOrder())
+                            .collect(Collectors.toList());
                 }
         );
 
@@ -99,8 +103,9 @@ public class TwitterOperations {
     }
 
     /**
-     *  It finds list of posts of given date
-     * @param keyword User provided input to fetch tweets.
+     * It finds list of posts of given date
+     *
+     * @param keyword   User provided input to fetch tweets.
      * @param givenDate Date provided by user.
      * @return List of Posts.
      * @throws TwitterException Exception
@@ -110,8 +115,8 @@ public class TwitterOperations {
         CompletableFuture<Stream<Status>> futureTweetsStream = operation.fetch(keyword);
 
         return futureTweetsStream.thenApply(tweetsStream -> {
-            return tweetsStream.filter(tweet -> tweet.getCreatedAt() == givenDate)
-                    .map(Status::getRetweetCount).collect(Collectors.toList());
+                    return tweetsStream.filter(tweet -> tweet.getCreatedAt() == givenDate)
+                            .map(Status::getRetweetCount).collect(Collectors.toList());
                 }
 
         );
@@ -120,6 +125,7 @@ public class TwitterOperations {
 
     /**
      * This function send sum of total Likes.
+     *
      * @param keyword User provided input to fetch tweets.
      * @return Sum of favorite clicks on provided list of posts.
      * @throws TwitterException Exception
@@ -128,7 +134,7 @@ public class TwitterOperations {
         CompletableFuture<Stream<Status>> futureTweetsStream = operation.fetch(keyword);
 
         return futureTweetsStream.thenApply(tweetsStream -> {
-            return tweetsStream.map(tweet -> tweet.getFavoriteCount()).mapToInt(Integer::intValue).sum();
+                    return tweetsStream.map(tweet -> tweet.getFavoriteCount()).mapToInt(Integer::intValue).sum();
                 }
         );
 

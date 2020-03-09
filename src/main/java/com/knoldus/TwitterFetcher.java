@@ -15,11 +15,17 @@ public class TwitterFetcher {
 
     TwitterFetcher() {
         twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer("e6uS4phTxImI68qlA6h4V3zwR",
-                "M8b4Q3sudgU9mNZgJx1onUlqQYi5h5YCK1GVacjAc8yHDAohFc");
+        String consumerKey=System.getenv("CONSUMER_KEY");
+        String CONSUMER_KEY = System.getenv("CONSUMER_KEY");
+        String CONSUMER_SECRET = System.getenv("CONSUMER_SECRET");
+        String TOKEN_KEY = System.getenv("TOKEN_KEY");
+        String TOKEN_SECRET = System.getenv("TOKEN_SECRET");
+
+        twitter.setOAuthConsumer(CONSUMER_KEY,
+                CONSUMER_SECRET);
         twitter.setOAuthAccessToken(new AccessToken(
-                "160922224-AKOoOasbqi3huqT7uyq4Og0Oqlucn8rKeD9IcUvU",
-                "7HgIJUmjOX2AZThvVp7RPWsZwOrW1ffpvkEpjeBSQynnH"));
+                TOKEN_KEY,
+                TOKEN_SECRET));
 
     }
 
@@ -33,7 +39,7 @@ public class TwitterFetcher {
     CompletableFuture<Stream<Status>> fetch(String keyword) throws TwitterException {
 
         Query query = new Query(keyword);
-
+        query.setCount(100);
         CompletableFuture<Stream<Status>> futureTweetsStream = CompletableFuture.supplyAsync(() -> {
             Stream<Status> tweetsStream = null;
             try {
